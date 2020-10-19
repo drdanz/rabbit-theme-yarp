@@ -171,12 +171,12 @@ slide_footer_loader.resize(canvas.width, footer_height)
 slide_body_bottom = footer_height
 slide_body_height = canvas.height - slide_body_top - slide_body_bottom
 
-@slide_banner ||= "images/logo-icub.png"
+@slide_banner ||= "images/logo-hsp.png"
 slide_banner_loader = ImageLoader.new(find_file(@slide_banner))
-banner_height = canvas.height/26.0
+banner_height = canvas.height/15.0
 slide_banner_loader.resize(nil, banner_height)
-banner_pos_x = canvas.width - slide_banner_loader.width
-banner_pos_y = canvas.height - slide_banner_loader.height - footer_height
+banner_pos_x = canvas.width - slide_banner_loader.width - canvas.width * 0.01
+banner_pos_y = canvas.height - slide_banner_loader.height - footer_height - canvas.height * 0.01
 
 #----------------------------------------
 # Slide Header Settings
@@ -315,14 +315,26 @@ end
 include_theme("title-shadow")
 
 #--------------------------------------
+# set title color and background-image
+#--------------------------------------
+# This is at the end because it has issues with the slide-footer-info theme
+@title_background_color ||= @yarp_color_03
+include_theme("title-background-color")
+# For some reason the background image is not found in subdirectory
+@title_background_image ||= File.expand_path(find_file("images/yarp-robot-transp_b-512.png"))
+include_theme("title-background-image")
+
+#--------------------------------------
 # set logo in title slide (bottom right)
 #--------------------------------------
-@title_logo ||= "images/logo-icub.png"
+@title_logo ||= "images/logo-full-hsp.png"
 title_logo_loader = ImageLoader.new(find_file(@title_logo))
 title_logo_pre_draw_proc = Proc.new do |slide, canvas, x, y, w, h, simulation|
   unless simulation
-    draw_x = canvas.width - title_logo_loader.width
-    draw_y = canvas.height - title_logo_loader.height
+    banner_height = canvas.height/7.5
+    title_logo_loader.resize(nil, banner_height)
+    draw_x = canvas.width - title_logo_loader.width - canvas.width * 0.03
+    draw_y = canvas.height - title_logo_loader.height - canvas.height * 0.03
     title_logo_loader.draw(canvas, draw_x, draw_y)
   end
   [x, y, w, h]
@@ -332,13 +344,3 @@ match(TitleSlide) do |slides|
   slides.delete_pre_draw_proc_by_name(name)
   slides.add_pre_draw_proc(name, &title_logo_pre_draw_proc)
 end
-
-#--------------------------------------
-# set title color and background-image
-#--------------------------------------
-# This is at the end because it has issues with the slide-footer-info theme
-@title_background_color ||= @yarp_color_03
-include_theme("title-background-color")
-# For some reason the background image is not found in subdirectory
-@title_background_image ||= File.expand_path(find_file("images/yarp-robot-transp_b-512.png"))
-include_theme("title-background-image")
